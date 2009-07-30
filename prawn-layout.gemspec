@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name = "prawn-layout"
-  spec.version = "0.2.0.2"
+  spec.version = "0.2.0.3"
   spec.platform = Gem::Platform::RUBY
   spec.summary = "An extension to Prawn that provides table support and other layout functionality"
   spec.files =  Dir.glob("{examples,lib,spec,vendor,data}/**/**/*") +

@@ -104,6 +104,7 @@ module Prawn
     # <tt>:border_color</tt>:: Sets the color of the borders.
     # <tt>:position</tt>:: One of <tt>:left</tt>, <tt>:center</tt> or <tt>n</tt>, where <tt>n</tt> is an x-offset from the left edge of the current bounding box
     # <tt>:width:</tt> A set width for the table, defaults to the sum of all column widths
+    # <tt>:max_width:</tt> The maximum width of the table, defaults to the width or the document's margin box width.
     # <tt>:column_widths:</tt> A hash of indices and widths in PDF points.  E.g. <tt>{ 0 => 50, 1 => 100 }</tt>
     # <tt>:row_colors</tt>:: An array of row background colors which are used cyclicly.   
     # <tt>:align</tt>:: Alignment of text in columns, for entire table (<tt>:center</tt>) or by column (<tt>{ 0 => :left, 1 => :center}</tt>)
@@ -128,7 +129,7 @@ module Prawn
       Prawn.verify_options [:font_size,:border_style, :border_width,
        :position, :headers, :row_colors, :align, :align_headers, 
        :header_text_color, :border_color, :horizontal_padding, 
-       :vertical_padding, :padding, :column_widths, :width, :header_color ], 
+       :vertical_padding, :padding, :column_widths, :width, :max_width, :header_color ], 
        options     
                                           
       configuration.update(options)  
@@ -148,7 +149,7 @@ module Prawn
       # Once we have all configuration setted...
       normalize_data
       check_rows_lengths
-      calculate_column_widths(options[:column_widths], options[:width])
+      calculate_column_widths(options[:column_widths], options[:width], options[:max_width])
     end                                        
     
     attr_reader :column_widths #:nodoc:
@@ -268,7 +269,7 @@ module Prawn
       width.ceil
     end
 
-    def calculate_column_widths(manual_widths=nil, width=nil)
+    def calculate_column_widths(manual_widths=nil, width=nil, max_width=nil)
       @column_widths = [0] * @data[0].inject(0){ |total, e| total + e.colspan }
 
       # Firstly, calculate column widths for cells without colspan attribute
@@ -317,7 +318,7 @@ module Prawn
       # Takes into consideration the manual widths specified (With full manual
       # widths specified, the width can exceed the document width as manual
       # widths are taken as gospel)
-      max_width = width || @document.margin_box.width
+      max_width ||= width || @document.margin_box.width
       calculated_width = @column_widths.inject {|sum,e| sum += e }
 
       if calculated_width > max_width
